@@ -41,7 +41,7 @@
 	};
 	QParser.prototype.parse = function(input, opt, stopChar) {
 		var c, i, parts = [], part = {}, buf = "", p1, p2, nopt,
-			quote, skip = false, hasdata = false, hasarg = false, or_at_next_arg = false,
+			quote, skip = false, hasdata = false, hasarg = false, or_at_next_arg = 0,
 			st = this.STATES.DATA,
 			appendPart = function() {
 				if (hasarg) {
@@ -55,13 +55,18 @@
 						else { part.type = "string"; }
 					}
 					parts.push(part);
-					if (or_at_next_arg && (parts.length >= 2)) {
+					if (or_at_next_arg && (or_at_next_arg + 1 === parts.length)) {
+						// console.log('ORing at', or_at_next_arg, parts.length);
+						// console.log('before', parts);
+						// console.log('part', part);
 						p2 = parts.pop();
 						p1 = parts.pop();
+						// console.log('after', parts);
 						parts.push({
 							type: "or",
 							queries: [ p1, p2 ]
 						});
+						or_at_next_arg = 0;
 					}
 				}
 				if (hasarg || !part.flags) {
@@ -78,7 +83,7 @@
 				c = input.charAt(i++);
 			}
 			skip = false;
-			// console.log('  :', i, 'c =',c, 'quote =', quote, 'buf =', buf, 'st =', st, 'hasdata =', hasdata, 'hasarg =', hasarg, 'or_next =', or_at_next_arg, 'flags.length =', part.flags ? part.flags.length : '-1', 'part.type =', part.type ? part.type : '-');
+			// console.log('  :', i, 'c =',c, 'quote =', quote, 'buf =', buf, 'st =', st, 'hasdata =', hasdata, 'hasarg =', hasarg, 'or_next =', or_at_next_arg, 'flags.length =', part.flags ? part.flags.length : '-1', 'parts.length =', parts.length);
 
 			if (st === this.STATES.DATA) {
 				if (c === "(") {
@@ -100,11 +105,12 @@
 					if (opt) { opt.pos = i; }
 					break;
 				} else if (c === "|") {
+					or_at_next_arg = parts.length;
 					if (hasarg) {
 						st = this.STATES.APPEND;
 						skip = true;
+						or_at_next_arg += 1;
 					}
-					or_at_next_arg = true;
 				} else if (c === ":") {
 					part.prefix = buf;
 					part.type = "prefix";
@@ -166,7 +172,7 @@
 		module.exports = QParser;
 	} catch(e) {
 		// browser case
-		window.qparser = QParser;
+		window.QParser = QParser;
 	}
 
 })();

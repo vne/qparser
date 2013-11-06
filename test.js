@@ -220,6 +220,31 @@ describe('complex queries', function() {
 			], qparser("(abc ('def q' +qwe))"))
 
 		});
+		it('should do OR grouping in the middle', function() {
+			assert.deepEqual([
+				{
+					type: "string",
+					query: "abc",
+				},
+				{
+					type: "or",
+					queries: [
+						{
+							type: "string",
+							query: "def"
+						},
+						{
+							type: "string",
+							query: "qwe"
+						}
+					]
+				},
+				{
+					type: "string",
+					query: "rty"
+				}
+			], qparser("abc def|qwe rty"))
+		});
 	});
 });
 
