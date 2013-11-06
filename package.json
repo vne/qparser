@@ -1,0 +1,38 @@
+{
+  "name": "qparser",
+  "version": "0.0.1",
+  "description": "A parsing library intended to parse complex user input",
+  "main": "qparser.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vne/qparser.git"
+  },
+  "keywords": [
+    "user",
+    "input",
+    "parsing",
+    "query"
+  ],
+  "author": "Vladimir Neverov <sanguini@gmail.com>",
+  "homepage": "https://github.com/vne/qparser/wiki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vne/qparser/issues",
+    "email": "sanguini@gmail.com"
+  },
+  "devDependencies": {
+    "assert": "~0.4.9",
+    "mocha": "~1.13.0",
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-simple-mocha": "~0.4.0",
+    "grunt-markdown": "~0.4.0",
+    "grunt-natural-docs": "~0.1.1",
+    "grunt-mkdir": "~0.1.1",
+    "grunt-execute": "~0.1.5"
+  }
+}
