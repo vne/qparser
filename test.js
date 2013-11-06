@@ -32,6 +32,12 @@ describe('simple queries', function() {
 				query: "abc def qqq"
 			}], qparser("'abc def qqq'"))
 		});
+		it('should correctly treat unclosed quote', function() {
+			assert.deepEqual([{
+				type: "string",
+				query: "abc def qqq"
+			}], qparser("'abc def qqq"))
+		});
 		it('should parse range arguments', function() {
 			assert.deepEqual([{
 				type: "range",
