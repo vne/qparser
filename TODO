@@ -1,1 +1,3 @@
  +  fix bug: wrong parsing of queries like "john smith|barbara streisand"
+
+ *  all special symbols should be configurable (ORs, ANDs, colons, etc)
