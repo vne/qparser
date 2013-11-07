@@ -22,6 +22,7 @@ You feed the parser with the text string and it returns an array of objects, eac
 one token. Tokens can be of the following types:
  -  range - a range query, e.g. "20-30" or "-50" or "45-"
  -  prefix - a string with a prefix separated by colon, e.g. "site:wikipedia.org"
+ -  prange - prefixed range, e.g. "price:100-200"
  -  string - any other input, e.g. arbitrary strings and numbers
  -  or - a group of queries that should be logically ORed, e.g. "love|hate"
  -  and - a group of queries that should be logically ANDed, e.g. "(jim morrisson)"
@@ -56,6 +57,13 @@ will produce
 	> [
 	>	{ type: "string", query: "bears" },
 	>	{ type: "range", from: 300, to: 500 }
+	> ]
+
+	> bears price:20-30
+will produce
+	> [
+	>	{ type: "string", query: "bears" },
+	>	{ type: "prange", prefix: "price", from: 20, to: 30 }
 	> ]
 
 Grouping

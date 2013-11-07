@@ -1,4 +1,5 @@
  +  fix bug: wrong parsing of queries like "john smith|barbara streisand"
+ +  added prefixed range arguments, e.g. "pref:15-20"
 
  *  all special symbols should be configurable (ORs, ANDs, colons, etc)
  *  add screening of special symbols, e.g. \"

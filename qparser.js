@@ -45,7 +45,7 @@
 			st = this.STATES.DATA,
 			appendPart = function() {
 				if (hasarg) {
-					if (part.type === "range") {
+					if (["range", "prange"].indexOf(part.type) >= 0) {
 						part.to = buf;
 					} else if (buf && buf.length) {
 						part.query = buf;
@@ -118,7 +118,11 @@
 					hasdata = false;
 					hasarg = true;
 				} else if (c === "-") {
-					part.type = "range";
+					if (part.type && (part.type === "prefix")) {
+						part.type = "prange";
+					} else {
+						part.type = "range";
+					}
 					part.from = buf;
 					buf = "";
 					hasdata = false;

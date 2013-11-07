@@ -59,6 +59,14 @@ describe('simple queries', function() {
 				to: 25
 			}], qparser("-25"))
 		});
+		it('should parse prefixed range arguments', function() {
+			assert.deepEqual([{
+				type: "prange",
+				prefix: "pref",
+				from: 15,
+				to: 25
+			}], qparser("pref:15-25"))
+		});
 		it('should parse string arguments with flags', function() {
 			assert.deepEqual([{
 				flags: ["+", "*", "/", "\\", "!", "#", "~"],
