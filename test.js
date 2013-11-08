@@ -69,25 +69,31 @@ describe('simple queries', function() {
 		});
 		it('should parse string arguments with flags', function() {
 			assert.deepEqual([{
-				flags: ["+", "*", "/", "\\", "!", "#", "~"],
+				flags: ["+", "*", "/", "!", "#", "~"],
 				type: "string",
 				query: "abcdef"
-			}], qparser("+*/\\!#~abcdef"))
+			}], qparser("+*/!#~abcdef"))
 		});
 		it('should parse several prefixed quoted words with flags', function() {
 			assert.deepEqual([{
-				flags: ["+", "*", "/", "\\", "!", "#"],
+				flags: ["+", "*", "/", "!", "#"],
 				type: "prefix",
 				prefix: "e",
 				query: "abcdef qwerty"
-			}], qparser("+*/\\!#e:'abcdef qwerty'"))
+			}], qparser("+*/!#e:'abcdef qwerty'"))
+		});
+		it('should screen special symbols with \\', function() {
+			assert.deepEqual([{
+				type: "string",
+				query: "+abcdef"
+			}], qparser("\\+abcdef"));
 		});
 	});
 	describe('several arguments', function() {
 		it('should parse two prefixed quoted arguments with flags', function() {
 			assert.deepEqual([
 				{
-					flags: ["+", "*", "/", "\\", "!", "#"],
+					flags: ["+", "*", "/", "!", "#"],
 					type: "prefix",
 					prefix: "e",
 					query: "abcdef qwerty"
@@ -98,7 +104,7 @@ describe('simple queries', function() {
 					prefix: "q",
 					query: "beacon is tasty"
 				}
-			], qparser("+*/\\!#e:'abcdef qwerty' +#q:'beacon is tasty'"))
+			], qparser("+*/!#e:'abcdef qwerty' +#q:'beacon is tasty'"))
 		});
 	});
 });
@@ -121,6 +127,18 @@ describe('complex queries', function() {
 					]
 				}
 			], qparser("(abc def)"))
+		});
+		it('should not group arguments in screened braces', function() {
+			assert.deepEqual([
+				{
+					type: "string",
+					query: "(abc"
+				},
+				{
+					type: "string",
+					query: "def)"
+				}
+			], qparser("\\(abc def)"))
 		});
 		it('should OR arguments separated by |', function() {
 			assert.deepEqual([

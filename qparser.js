@@ -33,7 +33,8 @@
 	}
 	QParser.prototype.QUOTES = /['"`]/; // '
 	QParser.prototype.SPACES = /[ \t\r\n]/;
-	QParser.prototype.FLAGS = /[~\+#!\*\/\\]/;
+	QParser.prototype.FLAGS = /[~\+#!\*\/]/;
+	QParser.prototype.SCREEN = /[\\]/;
 	QParser.prototype.STATES = {
 		DATA: 0,
 		APPEND: 1,
@@ -42,6 +43,7 @@
 	QParser.prototype.parse = function(input, opt, stopChar) {
 		var c, i, parts = [], part = {}, buf = "", p1, p2, nopt,
 			quote, skip = false, hasdata = false, hasarg = false, or_at_next_arg = 0,
+			screen = false,
 			st = this.STATES.DATA,
 			appendPart = function() {
 				if (hasarg) {
@@ -83,10 +85,17 @@
 				c = input.charAt(i++);
 			}
 			skip = false;
-			// console.log('  :', i, 'c =',c, 'quote =', quote, 'buf =', buf, 'st =', st, 'hasdata =', hasdata, 'hasarg =', hasarg, 'or_next =', or_at_next_arg, 'flags.length =', part.flags ? part.flags.length : '-1', 'parts.length =', parts.length);
+			// console.log('  :', i, 'c =',c, 'screen =', screen, 'buf =', buf, 'st =', st, 'hasdata =', hasdata, 'hasarg =', hasarg, 'or_next =', or_at_next_arg, 'flags.length =', part.flags ? part.flags.length : '-1', 'parts.length =', parts.length);
 
 			if (st === this.STATES.DATA) {
-				if (c === "(") {
+				if (screen) {
+					buf += c;
+					hasdata = true;
+					hasarg = true;
+					screen = false;
+				} else if (this.SCREEN.test(c)) {
+					screen = true;
+				} else if (c === "(") {
 					if (hasarg) {
 						buf += c;
 					} else {

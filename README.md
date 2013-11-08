@@ -66,6 +66,8 @@ will produce
 	>	{ type: "prange", prefix: "price", from: 20, to: 30 }
 	> ]
 
+All special symbols can be screened with backslash.
+
 Grouping
 --------
 
