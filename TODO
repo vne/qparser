@@ -4,3 +4,4 @@
 
  *  all special symbols should be configurable (ORs, ANDs, colons, etc)
  *  rewrite parser so that special symbols can be words, not symbols (like OR instead of |). Parser should operate on tokens, not characters.
+ *  add [] brackets for ORs
