@@ -154,13 +154,22 @@ This can be used as followes:
 	> var tokens = parserInstance.parse("user input");
 
 Constructor accepts the following options besides 'instance':
- -  quotes
- -  spaces
- -  flags
+ -  quotes           - symbols that are recognized as quotes (defaults are ', " and `)
+ -  spaces           - symbols that are recognized as spaces (defaults are <space>, '\t', '\r' and '\n' )
+ -  flags            - symbols that are recognized as flags (defaults are '~', '+', '#', '!', '*' and '/' )
+ -  screen           - symbols that are recognized as screen (default is '\' )
+ -  group_open       - symbols that are recognized as group openers (default is '(' )
+ -  group_close      - symbols that are recognized as group endings (default is ')' )
+ -  or               - symbols that are recognized as logical OR (default is '|' )
+ -  prefix           - symbols that are recognized as divider between prefix and value (default is ':' )
+ -  range            - symbols that are recognized as divider between first and second values in range (default is ':' )
+ -  or_open          - symbols that are recognized as OR group openers (default is '[')
+ -  or_close         - symbols that are recognized as OR group endings (default is ']')
 
 Each of these options can be either a regular expression or a string containing all symbols
-that will be treated as quotes, spaces and flags respectively. If an option is a regular
-expression, than it will be used to test if a symbol is something special. E.g.
+that will be treated as quotes, spaces, flags etc respectively. Unfortunately, special symbols should be
+characters, therefore, you can not use, for example, ' OR ' for logical ORs.
+If an option is a regular expression, than it will be used to test if a symbol is something special. E.g.
 	> var parser = new qparser({ quotes: '"', spaces: "\t" });
 will produce a parsing function that will only recognize " as a quote and \t as token delimeter.
 

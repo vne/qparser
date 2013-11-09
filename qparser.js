@@ -2,39 +2,39 @@
 	"use strict";
 
 	function QParser(opts) {
+		var i;
 		if (!opts) { opts = {}; }
 		this.options = opts;
-		if (opts.quotes) {
-			if (opts.quotes.constructor === RegExp) {
-				this.QUOTES = opts.quotes;
-			} else if (opts.quotes.constructor === String) {
-				this.QUOTES = new RegExp("[" + opts.quotes + "]");
+
+		// process special symbols overrides
+		for (i in opts) {
+			if (["quotes", "spaces", "flags", "screen", "group_open", "group_close", "or", "prefix", "range", "or_open", "or_close"].indexOf(i) >= 0) {
+				// console.log('override', i, opts[i], opts[i].constructor);
+				if (opts[i].constructor === RegExp) {
+					this[i.toUpperCase()] = opts[i];
+				} else if (opts[i].constructor === String) {
+					this[i.toUpperCase()] = new RegExp("[" + opts[i] + "]");
+				}
 			}
 		}
-		if (opts.spaces) {
-			if (opts.spaces.constructor === RegExp) {
-				this.SPACES = opts.spaces;
-			} else if (opts.spaces.constructor === String) {
-				this.SPACES = new RegExp("[" + opts.spaces + "]");
-			}
-		}
-		if (opts.flags) {
-			if (opts.flags.constructor === RegExp) {
-				this.FLAGS = opts.flags;
-			} else if (opts.flags.constructor === String) {
-				this.FLAGS = new RegExp("[" + opts.flags + "]");
-			}
-		}
+		
 		// a trick so that we can use a 'new QParser' result as a parsing function
 		// option 'instance' overrides this behaviour so that 'new' returns a class instance
 		if (!opts.instance) {
 			return this.parse.bind(this);
 		}
 	}
-	QParser.prototype.QUOTES = /['"`]/; // '
-	QParser.prototype.SPACES = /[ \t\r\n]/;
-	QParser.prototype.FLAGS = /[~\+#!\*\/]/;
-	QParser.prototype.SCREEN = /[\\]/;
+	QParser.prototype.QUOTES = /['"`]/;       // '   symbols that are recognized as quotes
+	QParser.prototype.SPACES = /[ \t\r\n]/;   //     symbols that are recognized as spaces
+	QParser.prototype.FLAGS = /[~\+#!\*\/]/;  //     symbols that are recognized as flags
+	QParser.prototype.SCREEN = /[\\]/;        //     symbols that are recognized as screen
+	QParser.prototype.GROUP_OPEN = /\(/;      //     symbols that are recognized as group openers
+	QParser.prototype.GROUP_CLOSE = /\)/;     //     symbols that are recognized as group endings
+	QParser.prototype.OR = /\|/;              //     symbols that are recognized as logical OR
+	QParser.prototype.PREFIX = /:/;           //     symbols that are recognized as divider between prefix and value
+	QParser.prototype.RANGE = /-/;            //     symbols that are recognized as divider between first and second values in range
+	QParser.prototype.OR_OPEN = /\[/;         //     symbols that are recognized as OR group openers
+	QParser.prototype.OR_CLOSE = /]/;         //     symbols that are recognized as OR group endings
 	QParser.prototype.STATES = {
 		DATA: 0,
 		APPEND: 1,
@@ -95,14 +95,15 @@
 					screen = false;
 				} else if (this.SCREEN.test(c)) {
 					screen = true;
-				} else if (c === "(") {
+				} else if (this.GROUP_OPEN.test(c)) {
+					// console.log('  GROUP_OPEN');
 					if (hasarg) {
 						buf += c;
 					} else {
 						part.type = "and";
 						nopt = { pos: i };
 						// console.log('calling self');
-						part.queries = this.parse(input, nopt, ")");
+						part.queries = this.parse(input, nopt, this.GROUP_CLOSE);
 						i = nopt.pos; // move index
 						if (part.queries && part.queries.length) {
 							hasarg = true;
@@ -110,23 +111,27 @@
 							skip = true;
 						}
 					}
-				} else if (c === stopChar) {
+				} else if (this.GROUP_CLOSE.test(c)) {
+					// console.log('  GROUP_CLOSE');
 					if (opt) { opt.pos = i; }
 					break;
-				} else if (c === "|") {
+				} else if (this.OR.test(c)) {
+					// console.log('  OR');
 					or_at_next_arg = parts.length;
 					if (hasarg) {
 						st = this.STATES.APPEND;
 						skip = true;
 						or_at_next_arg += 1;
 					}
-				} else if (c === ":") {
+				} else if (this.PREFIX.test(c)) {
+					// console.log('  PREFIX');
 					part.prefix = buf;
 					part.type = "prefix";
 					buf = "";
 					hasdata = false;
 					hasarg = true;
-				} else if (c === "-") {
+				} else if (this.RANGE.test(c)) {
+					// console.log('  RANGE');
 					if (part.type && (part.type === "prefix")) {
 						part.type = "prange";
 					} else {
@@ -137,9 +142,11 @@
 					hasdata = false;
 					hasarg = true;
 				} else if (this.SPACES.test(c)) {
+					// console.log('  SPACES');
 					st = this.STATES.APPEND;
 					skip = true;
 				} else if (this.QUOTES.test(c)) {
+					// console.log('  QUOTES');
 					if (buf.length) {
 						buf += c;
 						hasdata = true;
@@ -149,6 +156,7 @@
 						quote = c;
 					}
 				} else if (this.FLAGS.test(c)) {
+					// console.log('  FLAGS');
 					if (!buf.length) {
 						if (!part.flags) { part.flags = []; }
 						part.flags.push(c);

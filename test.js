@@ -88,7 +88,15 @@ describe('simple queries', function() {
 				query: "+abcdef"
 			}], qparser("\\+abcdef"));
 		});
+		it('should correctly process flags separated with spaces', function() {
+			assert.deepEqual([{
+				flags: ["+"],
+				type: "string",
+				query: "abcdef"
+			}], qparser("   +   abcdef   "));
+		});
 	});
+
 	describe('several arguments', function() {
 		it('should parse two prefixed quoted arguments with flags', function() {
 			assert.deepEqual([
@@ -138,7 +146,7 @@ describe('complex queries', function() {
 					type: "string",
 					query: "def)"
 				}
-			], qparser("\\(abc def)"))
+			], qparser("\\(abc def\\)"))
 		});
 		it('should OR arguments separated by |', function() {
 			assert.deepEqual([
