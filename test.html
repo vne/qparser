@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<title>QParser test page</title>
+		<link rel="stylesheet" type="text/css" href="./assets/mocha.css"/>
+		<script type="text/javascript" src="./assets/mocha.js"></script>
+		<script type="text/javascript" src="./assets/assert.js"></script>
+		<script type="text/javascript" src="./qparser.js"></script>
+		<script>
+			mocha.setup('bdd');
+		</script>
+		<script type="text/javascript" src="./test.js"></script>
+	</head>
+	<body>
+		<h2>QParser test page</h2>
+		<div id="mocha"/>
+		<script>
+			mocha.checkLeaks();
+			mocha.run();
+		</script
+	</body>
+</html>

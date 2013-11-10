@@ -1,8 +1,18 @@
-var assert = require('assert'),
-	QParser = require('./qparser');
+var _global, is_nodejs = false;
+try {
+        var assert, QParser;
+        _global = window;
+} catch(e) {
+        _global = global;
+        is_nodejs = true;
+}
+
+if (is_nodejs) {
+        assert = require('assert');
+        QParser = require('./qparser');
+}
 
 var qparser = new QParser();
-
 
 
 describe('simple queries', function() {
