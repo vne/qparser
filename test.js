@@ -136,6 +136,35 @@ describe('complex queries', function() {
 				}
 			], qparser("(abc def)"))
 		});
+		it('should correctly process closing brace', function() {
+			assert.deepEqual([
+				{
+					type: "string",
+					query: "def)"
+				},
+				{
+					type: "string",
+					query: "abc"
+				},
+			], qparser("def) abc"))
+		});
+		it('should correctly process openinig brace', function() {
+			assert.deepEqual([
+				{
+					type: "and",
+					queries: [
+						{
+							type: "string",
+							query: "def"
+						},
+						{
+							type: "string",
+							query: "abc"
+						}
+					]
+				}
+			], qparser("(def abc"))
+		});
 		it('should not group arguments in screened braces', function() {
 			assert.deepEqual([
 				{
