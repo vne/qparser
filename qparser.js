@@ -95,6 +95,23 @@
 					screen = false;
 				} else if (this.SCREEN.test(c)) {
 					screen = true;
+				} else if (this.OR_OPEN.test(c)) {
+					if (hasarg) {
+						buf += c;
+					} else {
+						part.type = "or";
+						nopt = { pos: i };
+						part.queries = this.parse(input, nopt, this.OR_CLOSE);
+						i = nopt.pos;
+						if (part.queries && part.queries.length) {
+							hasarg = true;
+							st = this.STATES.APPEND;
+							skip = true;
+						}
+					}
+				} else if (this.OR_CLOSE.test(c)) {
+					if (opt) { opt.pos = i; }
+					break;
 				} else if (this.GROUP_OPEN.test(c)) {
 					// console.log('  GROUP_OPEN');
 					if (hasarg) {

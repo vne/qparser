@@ -1,5 +1,6 @@
 var assert = require('assert'),
-	QParser = require('./qparser');
+	QParser = require('./qparser')
+	JSON = require('JSON');
 
 var qparser = new QParser();
 
@@ -284,6 +285,69 @@ describe('complex queries', function() {
 					query: "rty"
 				}
 			], qparser("abc def|qwe rty"))
+		});
+		it('should OR simple terms in square braces', function() {
+			assert.deepEqual([
+				{
+					type: "string",
+					query: "abc",
+				},
+				{
+					type: "or",
+					queries: [
+						{
+							type: "string",
+							query: "def"
+						},
+						{
+							type: "string",
+							query: "qwe"
+						},
+						{
+							type: "string",
+							query: "rty"
+						}
+					]
+				}
+			], qparser("abc [def qwe rty]"))
+		});
+		it('should OR complex terms in square braces', function() {
+			assert.deepEqual([
+				{
+					type: "or",
+					queries: [
+						{
+							type: "string",
+							query: "abc"
+						},
+						{
+							type: "and",
+							queries: [
+								{
+									flags: ["+"],
+									type: "string",
+									query: "def"
+								},
+								{
+									type: "prange",
+									prefix: "e",
+									from: 10,
+									to: 15
+								},
+								{
+									type: "prefix",
+									prefix: "p",
+									query: "qwe"
+								}
+							]
+						},
+						{
+							type: "string",
+							query: "rty"
+						}
+					]
+				}
+			], qparser("[abc (+def e:10-15 p:qwe) rty]"))
 		});
 	});
 });

@@ -71,6 +71,9 @@ All special symbols can be screened with backslash.
 Grouping
 --------
 
+Round brackets group everything inside them into a single logical term. The content
+is ANDed. Example:
+
 	> (sex drugs)|rocknroll
 will produce
 	> [
@@ -96,6 +99,30 @@ will produce
 	> 			}
 	> 		]
 	> 	}
+	> ]
+
+Square brackets also group everything inside them, but the content is ORed. Example:
+
+	> [sex drugs] rocknroll
+will produce
+	> [
+	> 	{
+	> 		type: "or",
+	> 		queries: [
+	>			{
+	>				type: "string",
+	>				query: "sex"
+	>			},
+	>			{
+	>				type: "string",
+	>				query: "drugs"
+	>			}
+	> 		]
+	> 	},
+	>	{
+	>		type: "string",
+	>		query: "rocknroll"
+	>	}
 	> ]
 
 More on flags, strings and spaces
@@ -153,7 +180,7 @@ usually 'new' returns a new instance. If you require an instance of the parser, 
 This can be used as followes:
 	> var tokens = parserInstance.parse("user input");
 
-Constructor accepts the following options besides 'instance':
+Besides 'instance', constructor accepts the following options:
  -  quotes           - symbols that are recognized as quotes (defaults are ', " and `)
  -  spaces           - symbols that are recognized as spaces (defaults are <space>, '\t', '\r' and '\n' )
  -  flags            - symbols that are recognized as flags (defaults are '~', '+', '#', '!', '*' and '/' )
@@ -179,4 +206,5 @@ Tests and examples
 
 More examples of library usage can be found in **test.js** file. To run tests you will
 need [Mocha](http://visionmedia.github.io/mocha/), the tests themselves use built-in
-NodeJS [assert](http://nodejs.org/api/assert.html) module.
+NodeJS [assert](http://nodejs.org/api/assert.html) module. To run tests in browser
+open **test.html** file.
