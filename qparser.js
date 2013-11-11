@@ -128,7 +128,7 @@
 							skip = true;
 						}
 					}
-				} else if (this.GROUP_CLOSE.test(c)) {
+				} else if (opt && opt.pos && this.GROUP_CLOSE.test(c)) {
 					// console.log('  GROUP_CLOSE');
 					if (opt) { opt.pos = i; }
 					break;
@@ -200,6 +200,7 @@
 				st = this.STATES.DATA;
 			}
 		}
+		if (opt) { opt.pos = i; }
 		appendPart();
 		// console.log('return', parts);
 		return parts;

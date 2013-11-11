@@ -1,9 +1,19 @@
-var assert = require('assert'),
-	QParser = require('./qparser')
-	JSON = require('JSON');
+var _global, is_nodejs = false;
+try {
+        var assert, QParser;
+        _global = window;
+} catch(e) {
+        _global = global;
+        is_nodejs = true;
+}
+
+if (is_nodejs) {
+        assert = require('assert');
+        QParser = require('./qparser');
+		JSON = require('JSON');
+}
 
 var qparser = new QParser();
-
 
 
 describe('simple queries', function() {
@@ -136,6 +146,35 @@ describe('complex queries', function() {
 					]
 				}
 			], qparser("(abc def)"))
+		});
+		it('should correctly process closing brace', function() {
+			assert.deepEqual([
+				{
+					type: "string",
+					query: "def)"
+				},
+				{
+					type: "string",
+					query: "abc"
+				},
+			], qparser("def) abc"))
+		});
+		it('should correctly process openinig brace', function() {
+			assert.deepEqual([
+				{
+					type: "and",
+					queries: [
+						{
+							type: "string",
+							query: "def"
+						},
+						{
+							type: "string",
+							query: "abc"
+						}
+					]
+				}
+			], qparser("(def abc"))
 		});
 		it('should not group arguments in screened braces', function() {
 			assert.deepEqual([
