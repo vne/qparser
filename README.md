@@ -26,6 +26,7 @@ one token. Tokens can be of the following types:
  -  string - any other input, e.g. arbitrary strings and numbers
  -  or - a group of queries that should be logically ORed, e.g. "love|hate"
  -  and - a group of queries that should be logically ANDed, e.g. "(jim morrisson)"
+
  It's your choice how to process this array of objects. It can be converted to an SQL query,
  to a query to a NoSQL database, etc.
 
@@ -33,38 +34,48 @@ Simple cases of search input
 ----------------------------
 
 	> bears monkeys
+	
 This will produce an array of two objects:
-	> [
-	>	{ type: "string", query: "bears" },
-	>	{ type: "string", query: "monkeys" }
-	> ]
+
+	[
+		{ type: "string", query: "bears" },
+		{ type: "string", query: "monkeys" }
+	 ]
 
 	> bears !monkeys
+	
 will produce
-	> [
-	>	{ type: "string", query: "bears" },
-	>	{ type: "string", query: "monkeys", flags: ["!"] }
-	> ]
+	
+	[
+		{ type: "string", query: "bears" },
+		{ type: "string", query: "monkeys", flags: ["!"] }
+	]
 
 	> animal:bears
+	
 will produce
-	> [
-	>	{ type: "prefix", prefix: "animal", query: "bears" }
-	> ]
+	
+	[
+		{ type: "prefix", prefix: "animal", query: "bears" }
+	]
 
 	> bears 300-500
+	
 will produce
-	> [
-	>	{ type: "string", query: "bears" },
-	>	{ type: "range", from: 300, to: 500 }
-	> ]
+
+	[
+		{ type: "string", query: "bears" },
+		{ type: "range", from: 300, to: 500 }
+	]
 
 	> bears price:20-30
+	
 will produce
-	> [
-	>	{ type: "string", query: "bears" },
-	>	{ type: "prange", prefix: "price", from: 20, to: 30 }
-	> ]
+
+	[
+		{ type: "string", query: "bears" },
+		{ type: "prange", prefix: "price", from: 20, to: 30 }
+	]
 
 All special symbols can be screened with backslash.
 
@@ -75,55 +86,59 @@ Round brackets group everything inside them into a single logical term. The cont
 is ANDed. Example:
 
 	> (sex drugs)|rocknroll
+	
 will produce
-	> [
-	> 	{
-	> 		type: "or",
-	> 		queries: [
-	> 			{
-	> 				type: "and",
-	> 				queries: [
-	> 					{
-	> 						type: "string",
-	> 						query: "sex"
-	> 					},
-	> 					{
-	> 						type: "string",
-	> 						query: "drugs"
-	> 					}
-	> 				]
-	> 			},
-	> 			{
-	> 				type: "string",
-	> 				query: "rocknroll"
-	> 			}
-	> 		]
-	> 	}
-	> ]
+
+	[
+		{
+			type: "or",
+			queries: [
+				{
+					type: "and",
+					queries: [
+						{
+							type: "string",
+							query: "sex"
+						},
+						{
+							type: "string",
+							query: "drugs"
+						}
+					]
+				},
+				{
+					type: "string",
+					query: "rocknroll"
+				}
+			]
+		}
+	]
 
 Square brackets also group everything inside them, but the content is ORed. Example:
 
 	> [sex drugs] rocknroll
+	
 will produce
-	> [
-	> 	{
-	> 		type: "or",
-	> 		queries: [
-	>			{
-	>				type: "string",
-	>				query: "sex"
-	>			},
-	>			{
-	>				type: "string",
-	>				query: "drugs"
-	>			}
-	> 		]
-	> 	},
-	>	{
-	>		type: "string",
-	>		query: "rocknroll"
-	>	}
-	> ]
+
+	 [
+	 	{
+	 		type: "or",
+	 		queries: [
+				{
+					type: "string",
+					query: "sex"
+				},
+				{
+					type: "string",
+					query: "drugs"
+				}
+	 		]
+	 	},
+		{
+			type: "string",
+			query: "rocknroll"
+		}
+	 ]
 
 More on flags, strings and spaces
 ---------------------------------
@@ -132,33 +147,44 @@ Each token in an input string can be prefixed by an arbitrary number of flags. B
 flags are symbols from the following list: ~, \, +, #, !, *, /, \
 Default list can be altered, see API.
 Example:
+
 	> ~\+#!*\/animal:bear
+	
 will produce
-	> [
-	>	{ type: "prefix", prefix: "animal", query: "bear", flags: ["~", "\", "", "+", "#", "!", "*\", "/"] }
-	> ]
+
+	 [
+		{ type: "prefix", prefix: "animal", query: "bear", flags: ["~", "\", "", "+", "#", "!", "*\", "/"] }
+	 ]
+	
 Flags in the array will appear in the same order as in the input string. Flags are not interpreted in any
 way, it is up to you to decide what does each flag mean.
 
 Everywhere where a string can appear, a quoted string can be used. E.g.
+
 	> "bears monkeys"
+	
 will produce
-	> [
-	>	{ type: "string", query: "bears monkeys" }
-	> ]
+
+	 [
+		{ type: "string", query: "bears monkeys" }
+	 ]
 
 	> animal:"white bears"
+	
 will produce
-	> [
-	>	{ type: "prefix", prefix: "animal", query: "white bears" }
-	> ]
+
+	 [
+		{ type: "prefix", prefix: "animal", query: "white bears" }
+	 ]
 
 By default, the following symbols are recognized as quotes: ", ', `
 This can be changed through API. If the quote is not closed, then
 the string will take everything until the end of the input.
 
 Spaces divide tokens, if not inside quotes. E.g.
+
 	> bears monkeys
+	
 will produce two tokens. The same input in quotes will produce one token. By default,
 the following symbols are recognized as spaces: \r, \n, \t and space itself. This can be
 changed, ses API.
@@ -168,19 +194,28 @@ API
 ===
 
 First you should require the library:
-	> var qparser = require('qparser');
+
+	var qparser = require('qparser');
+	
 Next, you should instantiate the parser:
-	> var parser = new qparser();
+
+	var parser = new qparser();
+	
 Finally, you can use it to parse strings:
-	> var tokens = parser("arbitrary user input");
+
+	var tokens = parser("arbitrary user input");
 
 So, require returns a class, instantiating with 'new' returns a parser function. The latter is not common case,
 usually 'new' returns a new instance. If you require an instance of the parser, you can pass an argument:
-	> var parserInstance = new qparser({ instance: true });
+
+	var parserInstance = new qparser({ instance: true });
+	
 This can be used as followes:
-	> var tokens = parserInstance.parse("user input");
+
+	var tokens = parserInstance.parse("user input");
 
 Besides 'instance', constructor accepts the following options:
+
  -  quotes           - symbols that are recognized as quotes (defaults are ', " and `)
  -  spaces           - symbols that are recognized as spaces (defaults are <space>, '\t', '\r' and '\n' )
  -  flags            - symbols that are recognized as flags (defaults are '~', '+', '#', '!', '*' and '/' )
@@ -197,6 +232,7 @@ Each of these options can be either a regular expression or a string containing 
 that will be treated as quotes, spaces, flags etc respectively. Unfortunately, special symbols should be
 characters, therefore, you can not use, for example, ' OR ' for logical ORs.
 If an option is a regular expression, than it will be used to test if a symbol is something special. E.g.
+
 	> var parser = new qparser({ quotes: '"', spaces: "\t" });
 will produce a parsing function that will only recognize " as a quote and \t as token delimeter.
 
