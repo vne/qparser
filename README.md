@@ -33,6 +33,8 @@ one token. Tokens can be of the following types:
 Simple cases of search input
 ----------------------------
 
+### 1
+
 	> bears monkeys
 	
 This will produce an array of two objects:
@@ -42,6 +44,8 @@ This will produce an array of two objects:
 		{ type: "string", query: "monkeys" }
 	 ]
 
+### 2
+
 	> bears !monkeys
 	
 will produce
@@ -50,6 +54,8 @@ will produce
 		{ type: "string", query: "bears" },
 		{ type: "string", query: "monkeys", flags: ["!"] }
 	]
+	
+### 3
 
 	> animal:bears
 	
@@ -59,6 +65,8 @@ will produce
 		{ type: "prefix", prefix: "animal", query: "bears" }
 	]
 
+### 4
+
 	> bears 300-500
 	
 will produce
@@ -67,6 +75,8 @@ will produce
 		{ type: "string", query: "bears" },
 		{ type: "range", from: 300, to: 500 }
 	]
+	
+### 5
 
 	> bears price:20-30
 	
@@ -233,7 +243,8 @@ that will be treated as quotes, spaces, flags etc respectively. Unfortunately, s
 characters, therefore, you can not use, for example, ' OR ' for logical ORs.
 If an option is a regular expression, than it will be used to test if a symbol is something special. E.g.
 
-	> var parser = new qparser({ quotes: '"', spaces: "\t" });
+	var parser = new qparser({ quotes: '"', spaces: "\t" });
+	
 will produce a parsing function that will only recognize " as a quote and \t as token delimeter.
 
 
